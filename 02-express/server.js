@@ -36,7 +36,14 @@ app.get('/users/:userId', (req, res) => {
 	// and send that user to a view (which displays that user's information)
 	console.log(`Would show user with id ${req.params.userId}`);
 
-	// res.render('user', {});
+
+	res.render('user', {
+		fname: users[req.params.userId].name.first,
+		lname: users[req.params.userId].name.last,
+		city: users[req.params.userId].location.city,
+		country: users[req.params.userId].location.country,
+		email: users[req.params.userId].email
+	});
 });
 
 // Respond with current time
