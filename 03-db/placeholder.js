@@ -26,7 +26,12 @@ con.connect(function(err) {
     console.log(result);
   }); */
 
+<<<<<<< HEAD
   let sql = 'INSER INTO pokemonCards SET ?';
+=======
+  /*
+  let sql = 'INSERT INTO pokemonCards SET ?';
+>>>>>>> 42c94cee59bf24c6f567261f37f757d012478729
   let data = {
     name: 'Gourgeist',
     hp: 100
@@ -35,5 +40,16 @@ con.connect(function(err) {
     if (err) throw err;
     console.log(result);
   })
+<<<<<<< HEAD
+=======
+  */
+
+  let sql = 'SELECT id, name, hp FROM pokemonCards WHERE hp >= ?';
+  let data = [100];
+  con.query(sql, data, function(err, result) {
+    if (err) throw err;
+    console.log(result);
+  })
+>>>>>>> 42c94cee59bf24c6f567261f37f757d012478729
 });
 
