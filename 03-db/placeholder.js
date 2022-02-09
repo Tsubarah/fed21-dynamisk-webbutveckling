@@ -18,11 +18,22 @@ con.connect(function(err) {
 
   console.log('Connected to database');
 
-  // con.query(sql, placeholder data, callback);
+  /*// con.query(sql, placeholder data, callback);
   let sql = 'INSERT INTO pokemonCards (name, hp) VALUES (?, ?)';
   let data = ['Talonflame', 130];
   con.query(sql, data, function(err, result) {
     if (err) throw err;
     console.log(result);
-  });
+  }); */
+
+  let sql = 'INSER INTO pokemonCards SET ?';
+  let data = {
+    name: 'Gourgeist',
+    hp: 100
+  };
+  con.query(sql, data, function(err, result) {
+    if (err) throw err;
+    console.log(result);
+  })
 });
+
