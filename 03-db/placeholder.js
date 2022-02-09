@@ -26,7 +26,7 @@ con.connect(function(err) {
     console.log(result);
   }); */
 
-  let sql = 'INSER INTO pokemonCards SET ?';
+  let sql = 'INSERT INTO pokemonCards SET ?';
   let data = {
     name: 'Gourgeist',
     hp: 100
