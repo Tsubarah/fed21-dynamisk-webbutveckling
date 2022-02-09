@@ -26,11 +26,20 @@ con.connect(function(err) {
     console.log(result);
   }); */
 
+  /*
   let sql = 'INSERT INTO pokemonCards SET ?';
   let data = {
     name: 'Gourgeist',
     hp: 100
   };
+  con.query(sql, data, function(err, result) {
+    if (err) throw err;
+    console.log(result);
+  })
+  */
+
+  let sql = 'SELECT id, name, hp FROM pokemonCards WHERE hp >= ?';
+  let data = [100];
   con.query(sql, data, function(err, result) {
     if (err) throw err;
     console.log(result);
