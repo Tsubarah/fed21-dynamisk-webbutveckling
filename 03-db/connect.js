@@ -1,5 +1,8 @@
+
+// Create connection to mySQL database
 const mysql = require('mysql');
 
+// Create connection information
 let con = mysql.createConnection(
     {
         host: 'localhost',
@@ -35,6 +38,7 @@ con.connect(function(err) {
             console.log('Pokemon has the name ' + row.name + ' with hp ' + row.hp);
         }
 
+        // End server connection
         con.end();
     });
 });
