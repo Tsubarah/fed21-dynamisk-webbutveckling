@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const multer = require('multer'); // Load multer
+const multer = require('multer'); // Load multer- Multer is used to handle files
 
 app.use(express.static('static'));
 
