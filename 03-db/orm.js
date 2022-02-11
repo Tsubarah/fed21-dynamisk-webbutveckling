@@ -1,4 +1,5 @@
 const pokemonCards = require('./pokemonCards');
+const pokemonFriends = require('./pokemonFriends');
 
 // Model is a description of data
 
@@ -25,6 +26,7 @@ pokemonCards.where({'hp': 100}).fetch().then((collection) => {
 });
 */
 
+/*
 // Create a new pokemonCards model
 const attribute = {
   name: 'Skrelp',
@@ -34,6 +36,25 @@ let skrelp = new pokemonCards(attribute);
 skrelp.save().then((res) => {
   console.log(res);
 });
+*/
+
 
 
 // destroy() is used to delete
+
+pokemonFriends.fetchAll().then((result) => {
+  console.log(result.toJSON());
+});
+
+for(let i = 0; i < 11; i++) {
+  const friends = {
+    name: 'Nodemon' +i,
+    email: 'nodemon' + i + '@email.nu'
+  }
+  let friendsList = pokemonFriends(friends);
+  friendsList.save().then((res) => {
+  console.log(res);
+});
+};
+
+
