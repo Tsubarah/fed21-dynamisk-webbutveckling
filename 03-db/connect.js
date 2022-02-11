@@ -1,3 +1,5 @@
+// To add a relation in the database: ALTER TABLE titles ADD CONSTRAINT fk_titles_authorid FOREIGN KEY(authorid) REFERENCES authors(id);
+
 
 // Create connection to mySQL database
 const mysql = require('mysql');
