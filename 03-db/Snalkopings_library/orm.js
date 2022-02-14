@@ -3,14 +3,15 @@ const titles = require('./titles');
 
 
 // const attribute = {
-//   firstname: "Robert",
-//   lastname: 'Jordan'
+//   firstname: "J.R.R",
+//   lastname: 'Tolkien'
 // };
 
-// let robertJordan = new authors(attribute);
-// robertJordan.save().then((res) => {
+// let tolkien = new authors(attribute);
+// tolkien.save().then((res) => {
 //   console.log(res.toJSON);
 // });
+
 
 authors.fetchAll().then((res) => {
   console.log(res.toJSON());
