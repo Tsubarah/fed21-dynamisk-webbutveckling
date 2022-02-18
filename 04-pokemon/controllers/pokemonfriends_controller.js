@@ -1,4 +1,5 @@
 const pokemonFriends = require('../models/pokemonFriends');
+const log = require('debug')('controller:pokemonFriends');
 
 // Create - skapa ett kort i databasen
 const create = async(req, res) => {
@@ -83,6 +84,7 @@ const destroy = async(req, res) => {
     try {
 
         let friend = await pokemonFriends.where({ 'id' : req.params.id }).fetch({ require : true });
+       
         friend = await friend.destroy();
 
         return res.status(200).send({
@@ -100,9 +102,32 @@ const destroy = async(req, res) => {
     }
 }
 
+const addCard = async(req, res) => {
+  try {
+
+    let friend = await pokemonFriends.where({ 'id' : req.params.id }).fetch({ require : true });
+
+    friend = await friend.cards().attach(req.body);       //set(req.body).save();
+
+    return res.status(200).send({
+      sucess: true,
+      data: {
+          friend
+      }
+  })
+
+  } catch (err) {
+    return res.status(500).send({
+      success: false, 
+      data: err.message
+  });
+}
+} 
+
 module.exports = {
     create,
     read,
     update,
-    destroy
+    destroy,
+    addCard
 }

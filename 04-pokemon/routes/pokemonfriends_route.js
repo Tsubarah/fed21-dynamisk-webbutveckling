@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pokemonfriends_controller = require('../controllers/pokemonfriends_controller');
+const log = require('debug')('route:pokemonFriends');
 
 // // Implement GET / READ - ALL
 // router.get('/', (req, res) => { // -> /pokemoncards/
@@ -52,5 +53,8 @@ router.put('/:id', pokemonfriends_controller.update);
 // curl -X DELETE http://localhost:3000/pokemoncards/1234
 router.delete('/:id', pokemonfriends_controller.destroy);
 
+// Implemented AddCard
+// curl -X POST http://localhost:3000/pokemonfriends/2/addCard -H 'Content-Type: application/json' -d '{ "card" : 11 }'
+router.post('/:id/addCard', pokemonfriends_controller.addCard);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 // Important to make sure that it's the bookshelf in this folder './'   Here I read in the ./bookshelf-file.
 const bookshelf = require('./bookshelf');
 const pokemonBattles = require('./pokemonBattles');
+const log = require('debug')('model:pokemonCards');
 
 // Model is an object from bookshelf which has many built-in functions
 const pokemonCards = bookshelf.Model.extend({
