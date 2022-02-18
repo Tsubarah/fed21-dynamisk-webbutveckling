@@ -1,16 +1,16 @@
-const titles = require('../models/titles');
+const users = require('../models/user');
 const log = require('../logging.js');
 
 // Create - skapa ett kort i databasen
 const create = async(req, res) => {
     try {
 
-        let title = await new titles(req.body).save();
+        let user = await new users(req.body).save();
 
         return res.status(201).send({
             success: true,
             data: {
-                title
+                user
             }
         });
 
@@ -26,15 +26,15 @@ const create = async(req, res) => {
 const read = async(req, res) => {
     try {
 
-        let title;
+        let user;
 
         if (req.params.id) {
-            title = await titles.where({ 'id' : req.params.id }).fetch( { require: false });
+            user = await users.where({ 'id' : req.params.id }).fetch( { require: false });
         } else {
-            title = await titles.fetchAll();
+            user = await users.fetchAll();
         }
 
-        if(!titles) {
+        if(!user) {
             return res.status(400).send({ 
                 success: false,
                 data: 'Not found'
@@ -45,7 +45,7 @@ const read = async(req, res) => {
         return res.status(200).send({
             success: true,
             data: {
-                title
+                user
             }
         });
 
@@ -61,14 +61,14 @@ const read = async(req, res) => {
 const update = async(res, req) => {
     try {
 
-        let title = await titles.where({ 'id' : req.params.id }).fetch({ require : true });
+        let user = await users.where({ 'id' : req.params.id }).fetch({ require : true });
 
-        title = await titles.set(req.body).save();
+        user = await user.set(req.body).save();
 
         return res.status(200).send({
             sucess: true,
             data: {
-                title
+                user
             }
         })
 
@@ -83,13 +83,13 @@ const update = async(res, req) => {
 const destroy = async(req, res) => {
     try {
 
-        let title = await titles.where({ 'id' : req.params.id }).fetch({ require : true });
-        title = await titles.destroy();
+        let user = await users.where({ 'id' : req.params.id }).fetch({ require : true });
+        user = await user.destroy();
 
         return res.status(200).send({
             success: true,
             data: {
-                title
+                user
             }
         });
 

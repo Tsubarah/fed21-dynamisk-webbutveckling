@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const authors_controller = require('../controllers/authors_controller');
+const log = require('../logging.js');
 
 // Implement GET / READ -  All pokemoncards
 // curl -X GET http://localhost:3000/pokemoncards/

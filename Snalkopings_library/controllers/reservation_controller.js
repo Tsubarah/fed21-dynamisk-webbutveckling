@@ -1,16 +1,16 @@
-const titles = require('../models/titles');
-const log = require('../logging.js');
+const reservations = require('../models/reservation');
+const log = require('../logging.js')
 
 // Create - skapa ett kort i databasen
 const create = async(req, res) => {
     try {
 
-        let title = await new titles(req.body).save();
+        let reservation = await new reservations(req.body).save();
 
         return res.status(201).send({
             success: true,
             data: {
-                title
+                reservation
             }
         });
 
@@ -26,15 +26,15 @@ const create = async(req, res) => {
 const read = async(req, res) => {
     try {
 
-        let title;
+        let reservation;
 
         if (req.params.id) {
-            title = await titles.where({ 'id' : req.params.id }).fetch( { require: false });
+            reservation = await reservations.where({ 'id' : req.params.id }).fetch( { require: false });
         } else {
-            title = await titles.fetchAll();
+            reservation = await reservations.fetchAll();
         }
 
-        if(!titles) {
+        if(!reservation) {
             return res.status(400).send({ 
                 success: false,
                 data: 'Not found'
@@ -45,7 +45,7 @@ const read = async(req, res) => {
         return res.status(200).send({
             success: true,
             data: {
-                title
+                reservation
             }
         });
 
@@ -61,14 +61,14 @@ const read = async(req, res) => {
 const update = async(res, req) => {
     try {
 
-        let title = await titles.where({ 'id' : req.params.id }).fetch({ require : true });
+        let reservation = await reservations.where({ 'id' : req.params.id }).fetch({ require : true });
 
-        title = await titles.set(req.body).save();
+        reservation = await reservations.set(req.body).save();
 
         return res.status(200).send({
             sucess: true,
             data: {
-                title
+                reservation
             }
         })
 
@@ -83,13 +83,13 @@ const update = async(res, req) => {
 const destroy = async(req, res) => {
     try {
 
-        let title = await titles.where({ 'id' : req.params.id }).fetch({ require : true });
-        title = await titles.destroy();
+        let reservation = await reservations.where({ 'id' : req.params.id }).fetch({ require : true });
+        reservation = await reservations.destroy();
 
         return res.status(200).send({
             success: true,
             data: {
-                title
+                reservation
             }
         });
 

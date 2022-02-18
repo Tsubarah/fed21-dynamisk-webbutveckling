@@ -1,9 +1,10 @@
 const authors = require('../models/authors');
+const log = require('../logging.js');
 
 // Create - skapa ett kort i databasen
 const create = async(req, res) => {
     try {
-
+        
         let author = await new authors(req.body).save();
 
         return res.status(201).send({
@@ -14,6 +15,7 @@ const create = async(req, res) => {
         });
 
     } catch (err) {
+        
         return res.status(500).send({
             success: false,
             data: err.message
@@ -24,13 +26,13 @@ const create = async(req, res) => {
 // Read - läs ett eller flera kort från databasen
 const read = async(req, res) => {
     try {
-
+        log.message('Reading author %s', message)
         let author;
 
         if (req.params.id) {
-            author = await authors.where({ 'id' : req.params.id }).fetch( { require: false });
+            author = await authors.where({ 'id' : req.params.id }).fetch( { require: false, withRelated: ['showTitles'] });
         } else {
-            author = await authors.fetchAll();
+            author = await authors.fetchAll({ withRelated: ['showTitles'] });
         }
 
         if(!author) {
@@ -49,6 +51,7 @@ const read = async(req, res) => {
         });
 
     } catch(err) {
+        
         return res.status(500).send({
             success: false,
             data: err.message
