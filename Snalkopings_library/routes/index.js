@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
     res.send('OK!');
 });
 
-// Läs in sub-routes
+// Läs in sub-routes Använd /authors som endpoint, och hämta den från ./authors_route
 router.use('/authors', require('./authors_route'));
 router.use('/titles', require('./titles_route'));
 router.use('/user', require('./user_route'));
