@@ -7,7 +7,7 @@ router.get('/', (req, res) => {
 });
 
 router.use('/authors', require('./authors_route'));
-//router.use('/titles', require('./titles_route'));
+router.use('/titles', require('./titles_route'));
 //router.use('/pokemonbattles', require('./pokemonbattles_route'));
 
 module.exports = router;
