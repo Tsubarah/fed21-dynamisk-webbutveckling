@@ -1,4 +1,5 @@
 const pokemonCards = require('../models/pokemonCards');
+const log = require('debug')('controller:pokemonCards');
 
 // Create - skapa ett kort i databasen
 const create = async(req, res) => {
@@ -14,6 +15,7 @@ const create = async(req, res) => {
         });
 
     } catch (err) {
+        log('Create failed: %s', err.message);
         return res.status(500).send({
             success: false,
             data: err.message
@@ -28,9 +30,9 @@ const read = async(req, res) => {
         let card;
 
         if (req.params.id) {
-            card = await pokemonCards.where({ 'id' : req.params.id }).fetch( { require: false });
+            card = await pokemonCards.where({ 'id' : req.params.id }).fetch( { require: false, withRelated: ['wonBattles', 'lostBattles'] });
         } else {
-            card = await pokemonCards.fetchAll();
+            card = await pokemonCards.fetchAll({ withRelated: ['wonBattles', 'lostBattles'] });
         }
 
         if(!card) {

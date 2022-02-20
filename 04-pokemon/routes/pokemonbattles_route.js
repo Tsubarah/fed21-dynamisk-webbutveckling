@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const log = require('debug')('route:pokemonBattles');
 
 // Implement GET / READ - ALL
 router.get('/', (req, res) => { // -> /pokemoncards/

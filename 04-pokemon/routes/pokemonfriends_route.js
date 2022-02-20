@@ -1,29 +1,60 @@
 const express = require('express');
 const router = express.Router();
+const pokemonfriends_controller = require('../controllers/pokemonfriends_controller');
+const log = require('debug')('route:pokemonFriends');
 
-// Implement GET / READ - ALL
-router.get('/', (req, res) => { // -> /pokemoncards/
-    res.send('GET not implemented');
-});
+// // Implement GET / READ - ALL
+// router.get('/', (req, res) => { // -> /pokemoncards/
+//     res.send('GET not implemented');
+// });
+
+// // Implement GET / READ - One Pokemoncard
+// router.get('/:id', (req, res) => {
+//     res.send('GET ' + req.params.id + ' not implemented yet')
+// });
+
+// router.post('/', (req, res) => {
+//     res.send('POST not yet implemented');
+// });
+
+// // Put updates
+// router.put('/:id', (req, res) => {
+//     res.send('PUT (' + req.params.id + ') not yet implemented')
+// });
+
+// // Delete deletes
+// router.delete('/:id', (req, res) => {
+//     res.send('DELETE (' + req.params.id + ') Not yet implemented')
+// });
+
+
+// Implement GET / READ -  All pokemoncards
+// curl -X GET http://localhost:3000/pokemoncards/
+router.get('/', pokemonfriends_controller.read);
 
 // Implement GET / READ - One Pokemoncard
+// curl -X GET http://localhost:3000/pokemoncards/1234
+/*
 router.get('/:id', (req, res) => {
     res.send('GET ' + req.params.id + ' not implemented yet')
 });
+*/
+router.get('/:id', pokemonfriends_controller.read);
 
-router.post('/', (req, res) => {
-    res.send('POST not yet implemented');
-});
+// Implement POST / CREATE - Create one pokemoncard
+// curl -X POST http://localhost:3000/pokemoncards/ -H 'content-type: application/json' -d '{ "name" : "Bobba Fett", "hp" : 145 }'
+router.post('/', pokemonfriends_controller.create);
 
-// Put updates
-router.put('/:id', (req, res) => {
-    res.send('PUT (' + req.params.id + ') not yet implemented')
-});
+// Implement PUT / UPDATE - Update one pokemoncard
+// curl -X PUT http://localhost:3000/pokemoncards/1234
+router.put('/:id', pokemonfriends_controller.update);
 
-// Delete deletes
-router.delete('/:id', (req, res) => {
-    res.send('DELETE (' + req.params.id + ') Not yet implemented')
-});
+// Implement DELETE / DELETE (DESTROY) - Delete one pokemoncard
+// curl -X DELETE http://localhost:3000/pokemoncards/1234
+router.delete('/:id', pokemonfriends_controller.destroy);
 
+// Implemented AddCard
+// curl -X POST http://localhost:3000/pokemonfriends/2/addCard -H 'Content-Type: application/json' -d '{ "card" : 11 }'
+router.post('/:id/addCard', pokemonfriends_controller.addCard);
 
 module.exports = router;

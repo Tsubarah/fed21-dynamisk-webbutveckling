@@ -1,7 +1,10 @@
 const express = require('express');
 const app = express();
 const multer = require('multer'); // Load multer- Multer is used to handle files
+const morgan = require('morgan'); // Morgan logs requests that we get in the console
 
+
+app.use(morgan('combined'));
 app.use(express.static('static'));
 
 // const urlencoded = express.urlencoded({ extended: false }); <-- For encoded URLs

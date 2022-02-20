@@ -1,16 +1,16 @@
-const titles = require('../models/titles');
-const log = require('../logging.js');
+const pokemonFriends = require('../models/pokemonFriends');
+const log = require('debug')('controller:pokemonFriends');
 
 // Create - skapa ett kort i databasen
 const create = async(req, res) => {
     try {
 
-        let title = await new titles(req.body).save();
+        let friend = await new pokemonFriends(req.body).save();
 
         return res.status(201).send({
             success: true,
             data: {
-                title
+                friend
             }
         });
 
@@ -26,15 +26,15 @@ const create = async(req, res) => {
 const read = async(req, res) => {
     try {
 
-        let title;
+        let friend;
 
         if (req.params.id) {
-            title = await titles.where({ 'id' : req.params.id }).fetch( { require: false });
+            friend = await pokemonFriends.where({ 'id' : req.params.id }).fetch( { require: false, withRelated: ['cards'] });
         } else {
-            title = await titles.fetchAll();
+            friend = await pokemonFriends.fetchAll({ withRelated: ['cards'] });
         }
 
-        if(!titles) {
+        if(!friend) {
             return res.status(400).send({ 
                 success: false,
                 data: 'Not found'
@@ -45,7 +45,7 @@ const read = async(req, res) => {
         return res.status(200).send({
             success: true,
             data: {
-                title
+                friend
             }
         });
 
@@ -61,14 +61,14 @@ const read = async(req, res) => {
 const update = async(res, req) => {
     try {
 
-        let title = await titles.where({ 'id' : req.params.id }).fetch({ require : true });
+        let friend = await pokemonFriends.where({ 'id' : req.params.id }).fetch({ require : true });
 
-        title = await titles.set(req.body).save();
+        friend = await friend.set(req.body).save();
 
         return res.status(200).send({
             sucess: true,
             data: {
-                title
+                friend
             }
         })
 
@@ -83,13 +83,14 @@ const update = async(res, req) => {
 const destroy = async(req, res) => {
     try {
 
-        let title = await titles.where({ 'id' : req.params.id }).fetch({ require : true });
-        title = await titles.destroy();
+        let friend = await pokemonFriends.where({ 'id' : req.params.id }).fetch({ require : true });
+       
+        friend = await friend.destroy();
 
         return res.status(200).send({
             success: true,
             data: {
-                title
+                friend
             }
         });
 
@@ -101,9 +102,32 @@ const destroy = async(req, res) => {
     }
 }
 
+const addCard = async(req, res) => {
+  try {
+
+    let friend = await pokemonFriends.where({ 'id' : req.params.id }).fetch({ require : true });
+
+    friend = await friend.cards().attach(req.body);       //set(req.body).save();
+
+    return res.status(200).send({
+      sucess: true,
+      data: {
+          friend
+      }
+  })
+
+  } catch (err) {
+    return res.status(500).send({
+      success: false, 
+      data: err.message
+  });
+}
+} 
+
 module.exports = {
     create,
     read,
     update,
-    destroy
+    destroy,
+    addCard
 }
