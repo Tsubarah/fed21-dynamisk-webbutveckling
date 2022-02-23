@@ -14,11 +14,12 @@
  const getProfile = async (req, res) => {
 	 // somehow get the authenticated user
 	 // and return it
- 
+	console.log('Hello from the other side', req.user)
+
 	 res.send({
 		 status: 'success',
 		 data: {
-			 user: null,
+			 user: req.user,
 		 }
 	 });
  }
@@ -29,11 +30,33 @@
   * PUT /
   */
  const updateProfile = async (req, res) => {
-	 res.status(405).send({
-		 status: 'error',
-		 message: 'This is a workshop.',
-	 });
- }
+
+	// make sure user exists
+	const user = await new models.User({ id: req.user.id }).fetch({ require: false });
+	
+	const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        return res.status(422).send({ 
+			status: 'fail', 
+			data: errors.array() });
+    }
+
+    const validData = matchedData(req);
+	res.send({ status: 'success', data: validData });
+
+	try {
+		const updatedUser = await user.save(validData);
+		debug("Updated user successfully: %O", updatedUser);
+
+	} catch (error) {
+		res.status(500).send({
+			status: 'error',
+			message: 'Exception thrown in database when updating a new user.',
+		});
+		throw error;
+	}
+}
+
  
  /**
   * Get authenticated user's books
@@ -41,9 +64,18 @@
   * GET /books
   */
  const getBooks = async (req, res) => {
-	 res.status(405).send({
-		 status: 'error',
-		 message: 'This is a workshop.',
+	// get user and also eagher-load the books-relation
+	//  const user = await new models.User({ id: req.user.id}).fetch({ require: false, withRelated: ['books']
+ 	// });
+
+	// "lazy load" the books-relation
+	await req.user.load('books');
+
+	 res.status(200).send({
+		 status: 'Success',
+		 data: {
+			 books: req.user.related('books')
+		 }
 	 });
  }
  

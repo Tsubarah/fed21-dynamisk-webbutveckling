@@ -10,7 +10,7 @@ const { User } = require('../models');
 /**
  * HTTP Basic Authentication
  */
-const basic = (req, res, next) => {
+const basic = async (req, res, next) => {
     debug('Hello from auth.basic!');
 
     // Check if Authorization header exists, if not, stop and send response
@@ -33,11 +33,37 @@ const basic = (req, res, next) => {
     // [1] = 'QmVlbmllOm1hbm5lbg=='
     const [authSchema, base64payload] = req.headers.authorization.split(' ');
 
-    // if authSchema isn't 'basic', then pass request along
-    if (authSchema.toLowercase() !== 'basic') {
+    // if authSchema isn't 'basic', then fail
+    if (authSchema.toLowerCase() !== 'basic') {
         // Not ours to authenticate
-        next();
+        debug("Authorization schema isn't basic")
+
+        return res.status(401).send({
+            status: 'fail',
+            data: 'Authorization required',
+        });
     }
+
+    // decode payload from base64 => ascii
+    const decodedPayload = Buffer.from(base64payload, 'base64').toString('ascii');
+    // decodedPayload = "username:password"
+    
+    // split decoded payload into "<username>:<password>"
+    const [username, password] = decodedPayload.split(':');
+
+    // check if a user with this username and password exists
+    const user = await new User({ username, password }) //username: username, password: password
+        .fetch({ require: false });
+
+        if (!user) {
+            return res.status(401).send({
+                status: 'fail',
+                data: 'Authorization failed',
+            });
+        }
+    // finally, attach user to request
+    req.user = user;
+
 
     // pass request along
     next();
