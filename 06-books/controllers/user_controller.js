@@ -4,6 +4,7 @@
 
 const debug = require('debug')('books:user_controller');
 const models = require('../models');
+const { matchedData, validationResult } = require('express-validator');
 
 /**
  * Get all resources
@@ -44,15 +45,18 @@ const show = async (req, res) => {
  * POST /
  */
 const store = async (req, res) => {
-	const data = {
-		username: req.body.username,
-		password: req.body.password,
-		first_name: req.body.first_name,
-		last_name: req.body.last_name,
-	};
+
+	const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        return res.status(422).send({ 
+			status: 'fail', 
+			data: errors.array() });
+    }
+
+    const validData = matchedData(req);
 
 	try {
-		const user = await new models.User(data).save();
+		const user = await new models.User(validData).save();
 		debug("Created new user successfully: %O", user);
 
 		res.send({
@@ -89,34 +93,19 @@ const update = async (req, res) => {
 		});
 		return;
 	}
+	const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        return res.status(422).send({ 
+			status: 'fail', 
+			data: errors.array() });
+    }
 
-	const data = {};
-
-	// update password if part of the request
-	if (req.body.password) {
-		data.password = req.body.password;
-	}
-
-	// update first_name if part of the request
-	if (req.body.first_name) {
-		data.first_name = req.body.first_name;
-	}
-
-	// update last_name if part of the request
-	if (req.body.last_name) {
-		data.last_name = req.body.last_name;
-	}
+    const validData = matchedData(req);
+	res.send({ status: 'success', data: validData });
 
 	try {
-		const updatedUser = await user.save(data);
+		const updatedUser = await user.save(validData);
 		debug("Updated user successfully: %O", updatedUser);
-
-		res.send({
-			status: 'success',
-			data: {
-				user,
-			},
-		});
 
 	} catch (error) {
 		res.status(500).send({

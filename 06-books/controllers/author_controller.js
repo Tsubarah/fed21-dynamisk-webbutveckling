@@ -4,6 +4,7 @@
 
 const debug = require('debug')('books:author_controller');
 const models = require('../models');
+const { matchedData, validationResult } = require('express-validator');
 
 /**
  * Get all resources
@@ -44,22 +45,21 @@ const show = async (req, res) => {
  * POST /
  */
 const store = async (req, res) => {
-	const data = {
-		first_name: req.body.first_name,
-		last_name: req.body.last_name,
-		birthyear: req.body.birthyear,
-	};
+	
+	const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        return res.status(422).send({ 
+			status: 'fail', 
+			data: errors.array() });
+    }
+
+    const validData = matchedData(req);
+	res.send({ status: 'success', data: validData });
+
 
 	try {
-		const author = await new models.Author(data).save();
+		const author = await new models.Author(validData).save();
 		debug("Created new author successfully: %O", author);
-
-		res.send({
-			status: 'success',
-			data: {
-				author,
-			},
-		});
 
 	} catch (error) {
 		res.status(500).send({
@@ -75,11 +75,40 @@ const store = async (req, res) => {
  *
  * POST /:authorId
  */
-const update = (req, res) => {
-	res.status(405).send({
-		status: 'fail',
-		message: 'Method Not Allowed.',
-	});
+ const update = async (req, res) => {
+	const authorId = req.params.authorId;
+
+	// make sure author exists
+	const author = await new models.User({ id: authorId }).fetch({ require: false });
+	if (!author) {
+		debug("User to update was not found. %o", { id: authorId });
+		res.status(404).send({
+			status: 'fail',
+			data: 'User Not Found',
+		});
+		return;
+	}
+	const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        return res.status(422).send({ 
+			status: 'fail', 
+			data: errors.array() });
+    }
+
+    const validData = matchedData(req);
+	res.send({ status: 'success', data: validData });
+
+	try {
+		const updatedAuthor = await author.save(validData);
+		debug("Updated author successfully: %O", updatedAuthor);
+
+	} catch (error) {
+		res.status(500).send({
+			status: 'error',
+			message: 'Exception thrown in database when updating a new author.',
+		});
+		throw error;
+	}
 }
 
 /**
