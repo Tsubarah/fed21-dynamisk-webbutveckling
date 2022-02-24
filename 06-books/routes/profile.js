@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const profileController = require('../controllers/profile_controller');
 const profileValidationRules = require('../validation/profile');
+// const bookValidationRules = require('../validation/book');
 
 /* Get authenticated user's profile */
 router.get('/', profileController.getProfile);  // <-- /profile
@@ -12,6 +13,9 @@ router.put('/', profileValidationRules.updateRules, profileController.updateProf
 
 /* Get authenticated user's books */ 
 router.get('/books', profileController.getBooks); // <-- /profile/books
+
+//Create validated book to profile
+router.post('/books', profileValidationRules.updateRules); // profileController.addBook
 
 
 

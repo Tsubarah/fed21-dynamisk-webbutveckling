@@ -31,9 +31,7 @@
   */
  const updateProfile = async (req, res) => {
 
-	// make sure user exists
-	const user = await new models.User({ id: req.user.id }).fetch({ require: false });
-	
+	// check for any validation errors
 	const errors = validationResult(req);
     if(!errors.isEmpty()) {
         return res.status(422).send({ 
@@ -41,12 +39,19 @@
 			data: errors.array() });
     }
 
-    const validData = matchedData(req);
-	res.send({ status: 'success', data: validData });
+	// Get only the validated data from the request
+  const validData = matchedData(req);
 
 	try {
-		const updatedUser = await user.save(validData);
+		const updatedUser = await req.user.save(validData);
 		debug("Updated user successfully: %O", updatedUser);
+
+		res.send({
+			status: 'success',
+			data: {
+				user: updatedUser,
+			}
+		});
 
 	} catch (error) {
 		res.status(500).send({
@@ -78,9 +83,58 @@
 		 }
 	 });
  }
+
+//  const addBook = async (req, res) => {
+// 	 const bookId = req.params.bookId;
+
+// 	 //make sure book exists
+// 	 const book = await new models.Book({ id: bookId }).fetch({ require: false });
+// 	 if (!book) {
+// 		 debug("Book to update was not found. %o", { id: bookId });
+// 		 res.status(404).send({
+// 			 status: 'fail',
+// 			 data: 'Book Not Found',
+// 		 });
+// 		 return;
+// 	 }
+
+// 	 // check for any validation errors
+// 	 const errors = validationResult(req);
+// 	 if (!errors.isEmpty()) {
+// 		return res.status(422).send({
+// 			status: 'failed to find book',
+// 			data: errors.array()
+// 		});
+// 	}
+
+// 	// get only the validated data from the request
+// 	 const validData = matchedData(req);
+
+// 	 try {
+// 		 const book = await new models.Book(validData).save();
+// 		 debug('Created new book successfully: %0', book);
+
+// 		 res.send({
+// 			 status: 'success',
+// 			 data: {
+// 				 book,
+// 			 }
+// 		 });
+
+// 	 } catch (error) {
+// 		res.status(500).send({
+// 			status: 'error',
+// 			message: 'Exception thrown in database when creating a new book.',
+// 		});
+// 		throw error;
+// 	 }
+//  }
+
+
  
  module.exports = {
 	 getProfile,
 	 updateProfile,
 	 getBooks,
+	//  addBook,
  }
