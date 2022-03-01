@@ -51,16 +51,14 @@ const basic = async (req, res, next) => {
     // split decoded payload into "<username>:<password>"
     const [username, password] = decodedPayload.split(':');
 
-    // check if a user with this username and password exists
-    const user = await new User({ username, password }) //username: username, password: password
-        .fetch({ require: false });
+    const user = await User.login(username, password);
+    if (!user) {
+        return res.status(401).send({
+            status: 'fail',
+            data: 'Authorization failed',
+        });
+    }
 
-        if (!user) {
-            return res.status(401).send({
-                status: 'fail',
-                data: 'Authorization failed',
-            });
-        }
     // finally, attach user to request
     req.user = user;
 
