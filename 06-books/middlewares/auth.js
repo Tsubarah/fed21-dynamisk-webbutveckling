@@ -6,6 +6,8 @@
 
 const debug = require('debug')('books:auth');
 const { User } = require('../models');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 /**
  * HTTP Basic Authentication
@@ -67,8 +69,50 @@ const basic = async (req, res, next) => {
     next();
 }
 
-// 
+
+/**
+ * Valite JWT token
+*/
+const validateJwtToken = (req, res, next) => {
+        
+        // Check if Authorization header exists, if not, stop and send response
+        if (!req.headers.authorization) {
+        debug('Authorization header missing');
+
+        return res.status(401).send({
+            status: 'fail',
+            data: 'Authorization required',
+        });
+    }
+
+
+    // Authorization: Bearer eyJhbGc9.BQaWdnIiwiaWF0IjoxNjQ2MTMyNDg3fQ.lT4r744J3P2iceY
+    // Split authorization header "authSchema token"
+    const [authSchema, token] = req.headers.authorization.split(' ');
+    if (authSchema.toLowerCase() !== 'bearer') {
+        return res.status(401).send({
+            status: 'fail',
+            data: 'Authorization required',
+        });
+    }
+
+
+    // verify token (and extract payload)
+    try {
+        const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+        req.user = payload;
+
+    } catch (error) {
+        return res.status(401).send({
+            status: 'fail',
+            data: 'Authorization required',
+        });
+    }
+
+    next();
+}
 
 module.exports = {
     basic,
+    validateJwtToken,
 }

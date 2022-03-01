@@ -20,17 +20,18 @@ const models = require('../models');
  */
 const login = async (req, res) => {
 	// destructure username and password from request body
-	// const { username, password } = req.body;
+	const { username, password } = req.body;
 
-	// login the user. Compare if username and pw is the same as the req with .login method
-	const user = await models.User.login(req.body.username, req.body.password);
+	// login the user
+	const user = await models.User.login(username, password);
 	if (!user) {
 		return res.status(401).send({
 			status: 'fail',
 			data: 'Authentication failed.',
 		});
 	}
-	// construct JWT payload
+
+	// construct jwt payload
 	const payload = {
 		sub: user.get('username'),
 		user_id: user.get('id'),
@@ -38,16 +39,16 @@ const login = async (req, res) => {
 	}
 
 	// sign payload and get access-token
-	const access_token = jwt.sign(payload, 'secretkey');
+	const access_token = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET);
 
 	// respond with the access-token
 	return res.send({
 		status: 'success',
 		data: {
-			access_token
-			// access_token: access_token
+			access_token,
+//			access_token: access_token,
 		}
-	})
+	});
 }
 
 

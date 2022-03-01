@@ -8,5 +8,9 @@ module.exports = (bookshelf) => {
 		books() {
 			return this.hasMany('Book');
 		},
+	}, {
+		async fetchById(id, fetchOptions = {}) {
+			return await new this({ id }).fetch(fetchOptions);
+		},
 	});
 }
