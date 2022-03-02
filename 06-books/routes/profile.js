@@ -15,7 +15,7 @@ router.put('/', profileValidationRules.updateRules, profileController.updateProf
 router.get('/books', profileController.getBooks); // <-- /profile/books
 
 //Create validated book to profile
-router.post('/books', profileValidationRules.updateRules); // profileController.addBook
+router.post('/books', profileValidationRules.updateRules, profileController.addBook); // profileController.addBook
 
 
 

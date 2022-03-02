@@ -71,7 +71,7 @@ const basic = async (req, res, next) => {
 
 
 /**
- * Valite JWT token
+ * Validate JWT token
 */
 const validateJwtToken = (req, res, next) => {
         

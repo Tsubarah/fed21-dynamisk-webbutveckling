@@ -11,10 +11,13 @@ router.get('/', (req, res, next) => {
 
 router.use('/authors', require('./authors'));
 router.use('/books', require('./books'));
-router.use('/profile', auth.validateJwtToken, require('./profile'));
+router.use('/profile', auth.validateJwtToken, require('./profile')); // auth.validateJwtToken is a middleware that requests user to be logged in.
 
 // login a user and request a JWT token
 router.post('/login', authController.login);
+
+// issue a new access-token
+router.post('/refresh', authController.refresh);
 
 // register a new user
 router.post('/register', userValidationRules.createRules, authController.register);
