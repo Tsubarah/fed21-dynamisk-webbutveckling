@@ -2,9 +2,9 @@
  * Profile Controller
  */
 
+ const bcrypt = require('bcrypt');
  const debug = require('debug')('books:profile_controller');
  const { matchedData, validationResult } = require('express-validator');
- const models = require('../models');
  
  /**
   * Get authenticated user's profile
@@ -42,6 +42,21 @@
 	// Get only the validated data from the request
   const validData = matchedData(req);
 
+	// update the user's password, but only if they sent us a new password
+	if (validData.password) {
+		try {
+			validData.password = await bcrypt.hash(validData.password, 10);
+	
+		} catch (error) {
+			res.status(500).send({
+				status: 'error',
+				message: 'Exception thrown when hashing the password.',
+			});
+			throw error;
+		}
+	}
+
+	// update the user with validated data and save
 	try {
 		const updatedUser = await req.user.save(validData);
 		debug("Updated user successfully: %O", updatedUser);
@@ -74,61 +89,60 @@
  	// });
 
 	// "lazy load" the books-relation
-	await req.user.load('books');
+	await req.user.load('books');  // Gets the books relation to the user
 
 	 res.status(200).send({
 		 status: 'Success',
 		 data: {
-			 books: req.user.related('books')
+			 books: req.user.related('books')  // Prints the books relation to the user
 		 }
 	 });
  }
 
-//  const addBook = async (req, res) => {
-// 	 const bookId = req.params.bookId;
+ const addBook = async (req, res) => {
+	// check for any validation errors
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(422).send({ status: 'fail', data: errors.array() });
+	}
 
-// 	 //make sure book exists
-// 	 const book = await new models.Book({ id: bookId }).fetch({ require: false });
-// 	 if (!book) {
-// 		 debug("Book to update was not found. %o", { id: bookId });
-// 		 res.status(404).send({
-// 			 status: 'fail',
-// 			 data: 'Book Not Found',
-// 		 });
-// 		 return;
-// 	 }
+	// get only the validated data from the request
+	const validData = matchedData(req);
 
-// 	 // check for any validation errors
-// 	 const errors = validationResult(req);
-// 	 if (!errors.isEmpty()) {
-// 		return res.status(422).send({
-// 			status: 'failed to find book',
-// 			data: errors.array()
-// 		});
-// 	}
+	// lazy-load book relationship
+	await req.user.load('books');
 
-// 	// get only the validated data from the request
-// 	 const validData = matchedData(req);
+	// get the user's books
+	const books = req.user.related('books');
 
-// 	 try {
-// 		 const book = await new models.Book(validData).save();
-// 		 debug('Created new book successfully: %0', book);
+	// check if book is already in the user's list of books
+	const existing_book = books.find(book => book.id == validData.book_id);
 
-// 		 res.send({
-// 			 status: 'success',
-// 			 data: {
-// 				 book,
-// 			 }
-// 		 });
+	// if it already exists, bail
+	if (existing_book) {
+		return res.send({
+			status: 'fail',
+			data: 'Book already exists.',
+		});
+	}
 
-// 	 } catch (error) {
-// 		res.status(500).send({
-// 			status: 'error',
-// 			message: 'Exception thrown in database when creating a new book.',
-// 		});
-// 		throw error;
-// 	 }
-//  }
+	try {
+		const result = await req.user.books().attach(validData.book_id);
+		debug("Added book to user successfully: %O", result);
+
+		res.send({
+			status: 'success',
+			data: null,
+		});
+
+	} catch (error) {
+		res.status(500).send({
+			status: 'error',
+			message: 'Exception thrown in database when adding a book to a user.',
+		});
+		throw error;
+	}
+}
 
 
  
@@ -136,5 +150,5 @@
 	 getProfile,
 	 updateProfile,
 	 getBooks,
-	//  addBook,
+	 addBook,
  }
