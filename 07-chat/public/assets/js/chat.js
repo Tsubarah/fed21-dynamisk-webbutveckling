@@ -7,6 +7,7 @@ const messagesEl = document.querySelector('#messages'); // ul element containing
 const messageForm = document.querySelector('#message-form');
 const messageEl = document.querySelector('#message');
 
+let room = null;
 let username = null;
 
 const addMessageToChat = (message, ownMsg = false) => {
@@ -16,14 +17,17 @@ const addMessageToChat = (message, ownMsg = false) => {
 	// set class of `li` to `message`
 	liEl.classList.add('message');
 
-	// set content of `li` element
-	liEl.innerHTML = ownMsg
-	 ? message.content
-	 : `<span class='user'>${message.username}</span>: ${message.content}`;
-
 	if (ownMsg) {
 		liEl.classList.add('you');
 	}
+
+	// get human readable time
+	const time = moment(message.timestamp).format('HH:mm:ss');
+
+	// set content of `li` element
+	liEl.innerHTML = ownMsg
+		? message.content
+		: `<span class="user">${message.username}</span><span class="content">${message.content}</span><span class="time">${time}</span>`;
 
 	// append `li` element to `#messages`
 	messagesEl.appendChild(liEl);
@@ -44,30 +48,34 @@ const addNoticeToChat = notice => {
 
 // listen for when a new user connects
 socket.on('user:connected', (username) => {
-	addNoticeToChat(`${username} connected`);
+	addNoticeToChat(`${username} connected 🥳`);
 });
 
 // listen for when a user disconnects
 socket.on('user:disconnected', (username) => {
-	addNoticeToChat(`${username} disconnected`);
+	addNoticeToChat(`${username} disconnected 😢`);
 });
 
 // listen for incoming messages
 socket.on('chat:message', message => {
-	console.log("Someone said:", message);
+	console.log("Someone said something:", message);
 
 	addMessageToChat(message);
 });
 
-// get username from form and emit `user:joined` and then show chat
+// get username and room from form and emit `user:joined` and then show chat
 usernameForm.addEventListener('submit', e => {
 	e.preventDefault();
 
+	room = usernameForm.room.value;
 	username = usernameForm.username.value;
 
-	// emit `user:joined` event, and once received acknowledgement -> show the chat
-	socket.emit('user:joined', username, (status) => {
-		console.log('Server ackowledged that user joined', status)
+	console.log(`User ${username} wants to join room ${room}`)
+
+	// emit `user:joined` event and when we get acknowledgement, THEN show the chat
+	socket.emit('user:joined', username, room, (status) => {
+		// we've received acknowledgement from the server
+		console.log("Server acknowledged that user joined", status);
 
 		if (status.success) {
 			// hide start view
@@ -90,10 +98,11 @@ messageForm.addEventListener('submit', e => {
 		return;
 	}
 
-	const msg =  { 
-		// username: username,
-		username, 
-		content: messageEl.value 
+	const msg = {
+		username,
+		room,
+		content: messageEl.value,
+		timestamp: Date.now(),
 	}
 
 	// send message to server
@@ -106,4 +115,3 @@ messageForm.addEventListener('submit', e => {
 	messageEl.value = '';
 	messageEl.focus();
 });
-
