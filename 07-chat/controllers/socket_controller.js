@@ -4,31 +4,71 @@
 
  const debug = require('debug')('chat:socket_controller');
 
- // list of socket-ids and their username
- const users = {};
+ // list of rooms and their connected users (socket-ids) 
+ const rooms = [
+     {
+         id: 'general',
+         name: 'General',
+         users: {},
+     },
+     {
+        id: 'major',
+        name: 'Major',
+        users: {},
+    },
+    {
+        id: 'sergeant',
+        name: 'Sergeant',
+        users: {},
+    },
+ ];
  
  let io = null;     // socket.io server instance
  
  const handleDisconnect = function() {
      debug(`Client ${this.id} disconnected :(`);
+    
+     // find the room that this socket is part of
+     const room = rooms.find(chatroom => chatroom.users.hasOwnProperty(this.id));
+     
+     // if socket was not in a room, dont broadcast disconnect
+     if (!room) {
+         return;
+     }
+
+     // let everyone in the room know that user has disconnected
+     this.broadcast.to(room.id).emit('user:disconnected', room.users[this.id]);
  
-     // let everyone connected know that user has disconnected
-     this.broadcast.emit('user:disconnected', users[this.id]);
- 
-     // remove user from list of connected users
-     delete users[this.id];
+     // remove user from list of users in that room
+     delete room.users[this.id];
  }
  
  // Handle when a user has joined the chat
- const handleUserJoined = function(username, room, callback) {
+ const handleUserJoined = function(username, room_id, callback) {
      // associate socket id with username
      users[this.id] = username;
  
-     debug(`User ${username} with socket id ${this.id} wants to join room '${room}'`);
+     debug(`User ${username} with socket id ${this.id} wants to join room '${room_id}'`);
 
      // join room
-     this.join(room);
- 
+     this.join(room_id);
+
+     // add socket to list of online users in this room
+     // a. Find room object with 'id' == 'general'
+     const room = rooms.find(chatroom => chatroom.id === room_id);
+
+     // This is refactored above
+    //  const room = rooms.find(chatroom  => {
+    //     if (chatroom.id === room_id) {
+    //         return true;
+    //     } else {
+    //         return false;
+    //     }
+    // });
+
+     // b. Add socket to room's 'users'object 
+     room.users[this.id] = username;
+
      // let everyone know that someone has connected to the chat
      this.broadcast.to(room).emit('user:connected', username);
  
