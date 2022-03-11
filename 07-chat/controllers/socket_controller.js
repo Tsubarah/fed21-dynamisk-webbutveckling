@@ -38,6 +38,12 @@
 
      // let everyone in the room know that user has disconnected
      this.broadcast.to(room.id).emit('user:disconnected', room.users[this.id]);
+
+     // confirm join 
+     callback({
+         success: true,
+         users: rooms.users
+     });
  
      // remove user from list of users in that room
      delete room.users[this.id];
